@@ -28,7 +28,7 @@
 
       # Add pnpm to PATH
       export PNPM_HOME="{{ openclaw_home }}/.local/share/pnpm"
-      export PATH="{{ openclaw_home }}/.local/bin:$PNPM_HOME:$PATH"
+      export PATH="{{ openclaw_home }}/.local/bin:$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 
       # Color support for common tools
       export CLICOLOR=1
@@ -102,6 +102,10 @@
     mode: '0644'
     content: |
       # .bash_profile - Executed for login shells
+      # OpenClaw CLI must be available even when login shells run commands non-interactively.
+      export PNPM_HOME="{{ openclaw_home }}/.local/share/pnpm"
+      export PATH="{{ openclaw_home }}/.local/bin:$PNPM_HOME/bin:$PNPM_HOME:$PATH"
+
       # Source .bashrc to ensure environment is loaded for login shells
       if [ -f ~/.bashrc ]; then
           . ~/.bashrc

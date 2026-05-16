@@ -26,6 +26,14 @@
       ansible.builtin.command: pnpm --version
       changed_when: false
 
+    - name: Verify pnpm global bin is available for openclaw login shells
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          sudo -iu {{ openclaw_user }} bash -lc 'case ":$PATH:" in *":$HOME/.local/share/pnpm/bin:"*) exit 0 ;; *) echo "$PATH"; exit 1 ;; esac'
+        executable: /bin/bash
+      changed_when: false
+
     - name: Verify openclaw directory structure
       ansible.builtin.stat:
         path: "{{ item.path }}"
@@ -40,6 +48,7 @@
         - { path: "{{ openclaw_home }}/.openclaw/agents/main/agent", mode: "0700" }
         - { path: "{{ openclaw_home }}/.openclaw/workspace" }
         - { path: "{{ openclaw_home }}/.ssh", mode: "0700" }
+        - { path: "{{ openclaw_home }}/.local/share/pnpm/bin" }
       register: dir_checks
 
     - name: Assert directories exist

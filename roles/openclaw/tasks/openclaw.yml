@@ -55,6 +55,7 @@
     mode: '0755'
   loop:
     - "{{ openclaw_home }}/.local/share/pnpm"
+    - "{{ openclaw_home }}/.local/share/pnpm/bin"
     - "{{ openclaw_home }}/.local/share/pnpm/store"
     - "{{ openclaw_home }}/.local/bin"
 
@@ -78,14 +79,18 @@
         pnpm config set global-dir {{ openclaw_home }}/.local/share/pnpm
         CHANGED=1
       fi
-      if [ "$CURRENT_BIN_DIR" != "{{ openclaw_home }}/.local/bin" ]; then
-        pnpm config set global-bin-dir {{ openclaw_home }}/.local/bin
+      if [ "$CURRENT_BIN_DIR" != "{{ openclaw_home }}/.local/share/pnpm/bin" ]; then
+        pnpm config set global-bin-dir {{ openclaw_home }}/.local/share/pnpm/bin
         CHANGED=1
       fi
       exit $CHANGED
     executable: /bin/bash
   become: true
   become_user: "{{ openclaw_user }}"
+  environment:
+    PNPM_HOME: "{{ openclaw_home }}/.local/share/pnpm"
+    PATH: "{{ openclaw_home }}/.local/bin:{{ openclaw_home }}/.local/share/pnpm/bin:{{ openclaw_home }}/.local/share/pnpm:/usr/local/bin:/usr/bin:/bin"
+    HOME: "{{ openclaw_home }}"
   register: pnpm_config_result
   changed_when: pnpm_config_result.rc == 1
   failed_when: pnpm_config_result.rc > 1
@@ -110,7 +115,7 @@
     block: |
       # pnpm configuration
       export PNPM_HOME="{{ openclaw_home }}/.local/share/pnpm"
-      export PATH="{{ openclaw_home }}/.local/bin:$PNPM_HOME:$PATH"
+      export PATH="{{ openclaw_home }}/.local/bin:$PNPM_HOME/bin:$PNPM_HOME:$PATH"
     create: true
     owner: "{{ openclaw_user }}"
     group: "{{ openclaw_user }}"
