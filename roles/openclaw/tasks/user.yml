@@ -1,5 +1,5 @@
 ---
-- name: Create openclaw system user
+- name: Create selected OpenClaw system user
   ansible.builtin.user:
     name: "{{ openclaw_user }}"
     comment: "OpenClaw Service User"
@@ -9,7 +9,7 @@
     home: "{{ openclaw_home }}"
     state: present
 
-- name: Ensure openclaw home directory has correct ownership
+- name: Ensure selected OpenClaw home directory has correct ownership
   ansible.builtin.file:
     path: "{{ openclaw_home }}"
     owner: "{{ openclaw_user }}"
@@ -17,7 +17,7 @@
     state: directory
     mode: '0755'
 
-- name: Configure .bashrc for openclaw user
+- name: Configure .bashrc for selected OpenClaw user
   ansible.builtin.blockinfile:
     path: "{{ openclaw_home }}/.bashrc"
     marker: "# {mark} ANSIBLE MANAGED BLOCK - OpenClaw config"
@@ -43,7 +43,7 @@
     group: "{{ openclaw_user }}"
     mode: '0644'
 
-- name: Add openclaw user to sudoers with scoped NOPASSWD
+- name: Add selected OpenClaw user to sudoers with scoped NOPASSWD
   ansible.builtin.copy:
     dest: "/etc/sudoers.d/{{ openclaw_user }}"
     mode: '0440'
@@ -89,7 +89,7 @@
       {{ openclaw_user }} ALL=(ALL) NOPASSWD: /usr/bin/journalctl -u openclaw *
     validate: /usr/sbin/visudo -cf %s
 
-- name: Set openclaw user as primary user for installation
+- name: Store selected OpenClaw user settings for installation
   ansible.builtin.set_fact:
     openclaw_user: "{{ openclaw_user }}"
     openclaw_home: "{{ openclaw_home }}"
@@ -112,23 +112,23 @@
       fi
 
 # Fix DBus issues for systemd user services
-- name: Get openclaw user ID
+- name: Get selected OpenClaw user ID
   ansible.builtin.command: "id -u {{ openclaw_user }}"
   register: openclaw_uid
   changed_when: false
   when: ansible_os_family == 'Debian' and not ci_test
 
-- name: Display openclaw user ID
+- name: Display selected OpenClaw user ID
   ansible.builtin.debug:
-    msg: "OpenClaw user ID: {{ openclaw_uid.stdout }}"
+    msg: "Selected OpenClaw user ID: {{ openclaw_uid.stdout }}"
   when: ansible_os_family == 'Debian' and not ci_test
 
-- name: Enable lingering for openclaw user (allows systemd user services without login)
+- name: Enable lingering for selected OpenClaw user (allows systemd user services without login)
   ansible.builtin.command: "loginctl enable-linger {{ openclaw_user }}"
   changed_when: false
   when: ansible_os_family == 'Debian' and not ci_test
 
-- name: Create runtime directory for openclaw user
+- name: Create runtime directory for selected OpenClaw user
   ansible.builtin.file:
     path: "/run/user/{{ openclaw_uid.stdout }}"
     state: directory
@@ -143,7 +143,7 @@
   when: ansible_os_family == 'Debian' and not ci_test
 
 # SSH key configuration
-- name: Create .ssh directory for openclaw user
+- name: Create .ssh directory for selected OpenClaw user
   ansible.builtin.file:
     path: "{{ openclaw_home }}/.ssh"
     state: directory
@@ -151,7 +151,7 @@
     group: "{{ openclaw_user }}"
     mode: '0700'
 
-- name: Add SSH authorized keys for openclaw user
+- name: Add SSH authorized keys for selected OpenClaw user
   ansible.posix.authorized_key:
     user: "{{ openclaw_user }}"
     state: present
@@ -161,7 +161,7 @@
 
 - name: Display SSH key configuration status
   ansible.builtin.debug:
-    msg: "{{ openclaw_ssh_keys | length }} SSH key(s) configured for openclaw user"
+    msg: "{{ openclaw_ssh_keys | length }} SSH key(s) configured for {{ openclaw_user }}"
   when: openclaw_ssh_keys | length > 0
 
 - name: Display SSH key warning if none configured
@@ -169,7 +169,7 @@
     msg: "No SSH keys configured. Set 'openclaw_ssh_keys' variable to allow SSH access."
   when: openclaw_ssh_keys | length == 0
 
-- name: Set XDG_RUNTIME_DIR in .bashrc for openclaw user
+- name: Set XDG_RUNTIME_DIR in .bashrc for selected OpenClaw user
   ansible.builtin.lineinfile:
     path: "{{ openclaw_home }}/.bashrc"
     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
@@ -180,7 +180,7 @@
     mode: '0644'
   when: ansible_os_family == 'Debian' and not ci_test
 
-- name: Set DBUS_SESSION_BUS_ADDRESS in .bashrc for openclaw user
+- name: Set DBUS_SESSION_BUS_ADDRESS in .bashrc for selected OpenClaw user
   ansible.builtin.blockinfile:
     path: "{{ openclaw_home }}/.bashrc"
     marker: "# {mark} ANSIBLE MANAGED BLOCK - DBus config"

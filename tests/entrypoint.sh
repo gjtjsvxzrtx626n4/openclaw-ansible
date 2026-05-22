@@ -2,6 +2,7 @@
 set -euo pipefail
 
 PLAYBOOK_ARGS=(-e ci_test=true -e ansible_become=false --connection=local)
+SERVER_ARGS=(-e ci_test=true -e ansible_become=false --connection=local -e openclaw_user=server)
 
 # --- Step 1: Convergence ---
 echo "===> Step 1: Convergence test"
@@ -13,8 +14,17 @@ echo "===> Step 2: Verification"
 ansible-playbook tests/verify.yml "${PLAYBOOK_ARGS[@]}"
 echo "===> Verification: PASSED"
 
-# --- Step 3: Idempotency ---
-echo "===> Step 3: Idempotency test"
+# --- Step 3: Custom user convergence + verification ---
+echo "===> Step 3: Custom user convergence test"
+ansible-playbook playbook.yml "${SERVER_ARGS[@]}"
+echo "===> Custom user convergence: PASSED"
+
+echo "===> Step 4: Custom user verification"
+ansible-playbook tests/verify.yml "${SERVER_ARGS[@]}"
+echo "===> Custom user verification: PASSED"
+
+# --- Step 5: Idempotency ---
+echo "===> Step 5: Idempotency test"
 IDEMPOTENCY_OUT=$(ansible-playbook playbook.yml "${PLAYBOOK_ARGS[@]}" 2>&1)
 echo "$IDEMPOTENCY_OUT"
 

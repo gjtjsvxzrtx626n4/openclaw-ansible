@@ -13,6 +13,16 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+OPENCLAW_USER="${OPENCLAW_USER:-openclaw}"
+OPENCLAW_HOME="${OPENCLAW_HOME:-}"
+if [ -z "$OPENCLAW_HOME" ]; then
+    USER_ENTRY="$(getent passwd "$OPENCLAW_USER" 2>/dev/null || true)"
+    if [ -n "$USER_ENTRY" ]; then
+        OPENCLAW_HOME="$(printf '%s' "$USER_ENTRY" | cut -d: -f6)"
+    fi
+fi
+OPENCLAW_HOME="${OPENCLAW_HOME:-/home/$OPENCLAW_USER}"
+
 # OpenClaw ASCII Art Lobster
 cat << 'LOBSTER'
 [0;36m
@@ -48,13 +58,13 @@ echo ""
 echo -e "📚 Documentation: ${GREEN}https://docs.openclaw.ai${NC}"
 echo ""
 
-# Switch to openclaw user for setup
-echo -e "${YELLOW}Switching to openclaw user for setup...${NC}"
+# Переключаемся на выбранного пользователя OpenClaw для первичной настройки.
+echo -e "${YELLOW}Switching to ${OPENCLAW_USER} user for setup...${NC}"
 echo ""
 echo "DEBUG: About to create init script..."
 
-# Create init script that will be sourced on login
-cat > /home/openclaw/.openclaw-init << 'INIT_EOF'
+# Создаём одноразовый init-скрипт, который выполнится при первом входе.
+cat > "${OPENCLAW_HOME}/.openclaw-init" << 'INIT_EOF'
 # Display welcome message
 echo "============================================"
 echo "📋 OpenClaw Setup - Next Steps"
@@ -92,15 +102,14 @@ echo ""
 rm -f ~/.openclaw-init
 INIT_EOF
 
-chown openclaw:openclaw /home/openclaw/.openclaw-init
+chown "${OPENCLAW_USER}:${OPENCLAW_USER}" "${OPENCLAW_HOME}/.openclaw-init"
 
-# Add one-time sourcing to .bashrc if not already there
-grep -q '.openclaw-init' /home/openclaw/.bashrc 2>/dev/null || {
-    echo '' >> /home/openclaw/.bashrc
-    echo '# One-time setup message' >> /home/openclaw/.bashrc
-    echo '[ -f ~/.openclaw-init ] && source ~/.openclaw-init' >> /home/openclaw/.bashrc
+# Добавляем одноразовый запуск в .bashrc, если его ещё нет.
+grep -q '.openclaw-init' "${OPENCLAW_HOME}/.bashrc" 2>/dev/null || {
+    echo '' >> "${OPENCLAW_HOME}/.bashrc"
+    echo '# One-time setup message' >> "${OPENCLAW_HOME}/.bashrc"
+    echo '[ -f ~/.openclaw-init ] && source ~/.openclaw-init' >> "${OPENCLAW_HOME}/.bashrc"
 }
 
-# Switch to openclaw user with explicit interactive shell
-# Using setsid to create new session + force pseudo-terminal allocation
-exec sudo -i -u openclaw /bin/bash --login
+# Переключаемся на выбранного пользователя с явным login shell.
+exec sudo -i -u "$OPENCLAW_USER" /bin/bash --login

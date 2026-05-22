@@ -1,0 +1,46 @@
+---
+- name: Validate selected OpenClaw user name
+  ansible.builtin.assert:
+    that:
+      - openclaw_user is string
+      - openclaw_user | trim | length > 0
+      - openclaw_user is match('^[a-z_][a-z0-9_-]{0,31}[$]?$')
+    fail_msg: >-
+      Недопустимый openclaw_user '{{ openclaw_user }}'. Используйте Linux-имя
+      пользователя, например 'openclaw' или 'server'.
+
+- name: Look up selected OpenClaw user home
+  ansible.builtin.command:
+    argv:
+      - getent
+      - passwd
+      - "{{ openclaw_user }}"
+  register: openclaw_passwd_entry
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Resolve selected OpenClaw user home
+  ansible.builtin.set_fact:
+    openclaw_home: >-
+      {{
+        (openclaw_home | string | trim)
+        if (openclaw_home | default('', true) | string | trim | length > 0)
+        else (
+          openclaw_passwd_entry.stdout.split(':')[5]
+          if openclaw_passwd_entry.rc == 0 and (openclaw_passwd_entry.stdout.split(':') | length) > 5
+          else '/home/' ~ openclaw_user
+        )
+      }}
+
+- name: Validate selected OpenClaw home directory
+  ansible.builtin.assert:
+    that:
+      - openclaw_home is string
+      - openclaw_home | trim | length > 0
+      - openclaw_home is match('^/')
+    fail_msg: "openclaw_home должен быть абсолютным путём, получено '{{ openclaw_home }}'."
+
+- name: Display selected OpenClaw user
+  ansible.builtin.debug:
+    msg: "Пользователь OpenClaw: {{ openclaw_user }} (home: {{ openclaw_home }})"

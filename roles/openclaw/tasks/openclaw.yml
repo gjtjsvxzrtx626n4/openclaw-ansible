@@ -6,7 +6,7 @@
     fail_msg: "Invalid openclaw_install_mode: '{{ openclaw_install_mode }}'. Must be 'release' or 'development'."
     success_msg: "Valid install mode: {{ openclaw_install_mode }}"
 
-- name: Ensure openclaw home directory exists with correct ownership
+- name: Ensure selected OpenClaw home directory exists with correct ownership
   ansible.builtin.file:
     path: "{{ openclaw_home }}"
     state: directory
@@ -69,7 +69,7 @@
     mode: '0755'
   when: pnpm_ownership_drift.stdout | default('') | length > 0
 
-- name: Configure pnpm for openclaw user
+- name: Configure pnpm for selected OpenClaw user
   ansible.builtin.shell:
     cmd: |
       CURRENT_GLOBAL_DIR=$(pnpm config get global-dir 2>/dev/null || echo "")
@@ -108,7 +108,7 @@
   ansible.builtin.include_tasks: openclaw-development.yml
   when: openclaw_install_mode == "development"
 
-- name: Configure .bashrc for openclaw user (base config)
+- name: Configure .bashrc for selected OpenClaw user (base config)
   ansible.builtin.blockinfile:
     path: "{{ openclaw_home }}/.bashrc"
     marker: "# {mark} ANSIBLE MANAGED BLOCK - OpenClaw pnpm"
@@ -131,7 +131,7 @@
     msg: |
       OpenClaw is installed but NOT configured yet.
 
-      Next steps (run as openclaw user):
+      Next steps (run as {{ openclaw_user }}):
       1. Switch user: sudo su - {{ openclaw_user }}
       2. Run onboarding: openclaw onboard --install-daemon
 

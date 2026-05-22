@@ -31,10 +31,10 @@ dependencies:
   community.general: ">=8.0.0"
   ansible.posix: ">=1.5.0"
 
-repository: https://github.com/openclaw/openclaw-ansible
-documentation: https://github.com/openclaw/openclaw-ansible/blob/main/README.md
+repository: https://github.com/gjtjsvxzrtx626n4/openclaw-ansible
+documentation: https://github.com/gjtjsvxzrtx626n4/openclaw-ansible/blob/main/README.md
 homepage: https://github.com/openclaw/openclaw
-issues: https://github.com/openclaw/openclaw-ansible/issues
+issues: https://github.com/gjtjsvxzrtx626n4/openclaw-ansible/issues
 
 build_ignore:
   - .git

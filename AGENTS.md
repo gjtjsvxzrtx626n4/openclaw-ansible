@@ -186,4 +186,4 @@ Clean lifecycle, auto-start, logging integration.
 ## Support Channels
 
 - OpenClaw issues: https://github.com/openclaw/openclaw
-- This installer: https://github.com/openclaw/openclaw-ansible
+- This installer: https://github.com/gjtjsvxzrtx626n4/openclaw-ansible

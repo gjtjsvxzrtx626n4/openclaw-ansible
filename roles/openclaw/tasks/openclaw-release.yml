@@ -1,7 +1,7 @@
 ---
 # Release mode installation - Install via pnpm from npm registry
 
-- name: Install OpenClaw globally as openclaw user (using pnpm)
+- name: Install OpenClaw globally as selected user (using pnpm)
   ansible.builtin.shell:
     cmd: pnpm install -g openclaw@latest
     executable: /bin/bash

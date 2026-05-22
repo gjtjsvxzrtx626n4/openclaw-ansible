@@ -54,25 +54,25 @@ Directly edit `roles/openclaw/defaults/main.yml` before running the playbook.
 #### `openclaw_user`
 - **Type**: String
 - **Default**: `openclaw`
-- **Description**: System user name for running OpenClaw
+- **Description**: Имя системного пользователя, под которым устанавливается и запускается OpenClaw.
 - **Example**:
   ```bash
-  -e openclaw_user=myuser
+  -e openclaw_user=server
   ```
 
 #### `openclaw_home`
 - **Type**: String
-- **Default**: `/home/openclaw`
-- **Description**: Home directory for the openclaw user
+- **Default**: домашний каталог существующего `openclaw_user` или `/home/{{ openclaw_user }}` для нового пользователя
+- **Description**: Домашний каталог выбранного пользователя OpenClaw. Задавайте явно только если нужен нестандартный путь.
 - **Example**:
   ```bash
-  -e openclaw_home=/home/myuser
+  -e openclaw_home=/opt/openclaw-user
   ```
 
 #### `openclaw_ssh_keys`
 - **Type**: List of strings
 - **Default**: `[]` (empty)
-- **Description**: SSH public keys for accessing the openclaw user account
+- **Description**: Публичные SSH-ключи для доступа к выбранной учётной записи OpenClaw.
 - **Example**:
   ```yaml
   openclaw_ssh_keys:
@@ -241,6 +241,13 @@ ansible-playbook playbook.yml --ask-become-pass -e @vars-prod.yml
 ```
 
 ### Custom User and Directories
+
+Если нужен только существующий пользователь `server`, достаточно передать `openclaw_user`.
+Домашний каталог будет взят из passwd, а для нового пользователя станет `/home/server`.
+
+```bash
+ansible-playbook playbook.yml --ask-become-pass -e openclaw_user=server
+```
 
 ```yaml
 # vars-custom.yml

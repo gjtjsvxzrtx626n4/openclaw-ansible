@@ -6,10 +6,10 @@
 
   vars:
     openclaw_user: openclaw
-    openclaw_home: /home/openclaw
+    openclaw_home: "/home/{{ openclaw_user }}"
 
   tasks:
-    - name: Verify openclaw user exists
+    - name: Verify selected OpenClaw user exists
       ansible.builtin.command: "id {{ openclaw_user }}"
       changed_when: false
 
@@ -26,7 +26,7 @@
       ansible.builtin.command: pnpm --version
       changed_when: false
 
-    - name: Verify pnpm global bin is available for openclaw login shells
+    - name: Verify pnpm global bin is available for selected user login shells
       ansible.builtin.shell:
         cmd: |
           set -o pipefail
@@ -34,7 +34,7 @@
         executable: /bin/bash
       changed_when: false
 
-    - name: Verify openclaw directory structure
+    - name: Verify selected user directory structure
       ansible.builtin.stat:
         path: "{{ item.path }}"
       loop:

